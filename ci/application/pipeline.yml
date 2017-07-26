@@ -1,0 +1,88 @@
+---
+
+resource_types:
+- name: maven-resource
+  type: docker-image
+  source:
+    repository: pivotalpa/maven-resource
+    tag: 1.3.2
+
+resources:
+- name: source-code
+  type: git
+  source:
+    uri: {{source-code-url}}
+    branch: {{source-code-branch}}
+    private_key: {{source-code-private-key}}
+    ignore_paths:
+      - version
+
+- name: version
+  type: semver
+  source:
+    driver: git
+    initial_version: {{initial_version}}
+    uri: {{source-code-url}}
+    private_key: {{source-code-private-key}}
+    branch: {{source-code-branch}}
+    file: version
+
+- name: artifact-repo
+  type: maven-resource
+  source:
+    url: {{artifact-repo-url}}
+    artifact: {{artifact}}
+    username: {{artifact-repo-username}}
+    password: {{artifact-repo-password}}
+
+- name: pcf-resource
+  type: cf
+  source:
+    api: {{pcf-resource-api}}
+    username: {{pcf-resource-username}}
+    password: {{pcf-resource-password}}
+    organization: {{pcf-resource-organization}}
+    space: {{pcf-resource-space}}
+    skip_cert_check: {{pcf-resource-skip_cert_check}}
+
+jobs:
+- name: build-and-verify
+  plan:
+  - get: source-code
+    trigger: true
+  - get: version
+  - task: build-and-verify
+    file: source-code/tasks/build.yml
+  - put: artifact-repo
+    params:
+      file: build-artifact/*.jar
+      pom_file: source-code/pom.xml
+
+- name: deploy
+  plan:
+  - get: artifact-repo
+    trigger: true
+    passed: [build-and-verify]
+  - get: source-code
+  - task: generate-manifest
+    file: source-code/tasks/generate-manifest.yml
+    input_mapping: {artifact: artifact-repo}
+    params:
+      APP_NAME: {{pcf-app-name}}
+      APP_HOST: {{pcf-app-host}}
+      APP_DOMAIN: {{pcf-app-domain}}
+  - put: pcf-resource
+    params:
+      manifest: manifest/manifest.yml
+
+- name: increase-major
+  serial: true
+  plan:
+  - put: version
+    params: { bump: major }
+
+- name: increase-minor
+  serial: true
+  plan:
+  - put: version
+    params: { bump: minor }
