@@ -5,10 +5,11 @@ image_resource:
   source: {repository: concourse/buildroot, tag: curl}
 
 inputs:
+  - name: pipeline
   - name: source-code
   - name: artifact
 outputs:
   - name: manifest
 
 run:
-  path: source-code/tasks/generate-manifest.sh
+  path: pipeline/tasks/generate-manifest.sh
