@@ -1,4 +1,13 @@
 ---
+groups:
+- name: main
+  jobs:
+  - build-and-verify
+  - deploy
+- name: versioning
+  jobs:
+  - increase-minor
+  - increase-major
 
 resource_types:
 - name: maven-resource
