@@ -17,6 +17,14 @@ PIPELINE=$2
 CREDENTIALS=credentials.yml
 SECRETS=secrets.yml
 
+
+tmp=$(mktemp $TMPDIR/pipeline.XXXXXX.yml)
+trap 'rm $tmp' EXIT
+
+PIPELINE_FILES="$PIPELINE_DIR/ci/application/pipeline.yml"
+
+echo "Generating $PIPELINE pipeline ..."
+spruce merge --prune meta --prune pipeline --prune app --prune deployment $PIPELINE_FILES $CREDENTIALS $SECRETS > $tmp
+
 echo "Setting $PIPELINE pipeline in Concourse ..."
-fly -t "$FLY_TARGET" set-pipeline -p "$PIPELINE" \
-  -c "$PIPELINE_DIR"/ci/application/pipeline.yml -l "$PIPELINE_DIR"/credentials.yml -l "$PIPELINE_DIR"/secrets.yml \
+fly -t "$FLY_TARGET" set-pipeline -p "$PIPELINE" -c $tmp

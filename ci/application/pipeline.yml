@@ -12,16 +12,16 @@ resources:
 - name: pipeline
   type: git
   source:
-    uri: {{pipeline-url}}
-    branch: {{pipeline-branch}}
-    private_key: {{pipeline-private-key}}
+    uri: (( grab pipeline.source.uri ))
+    branch: (( grab pipeline.source.branch ))
+    private_key: (( grab pipeline.source.private_key ))
 
 - name: source-code
   type: git
   source:
-    uri: {{source-code-url}}
-    branch: {{source-code-branch}}
-    private_key: {{source-code-private-key}}
+    uri: (( grab app.source.uri ))
+    branch: (( grab app.source.branch ))
+    private_key: (( grab app.source.private_key ))
     ignore_paths:
       - version
 
@@ -29,29 +29,29 @@ resources:
   type: semver
   source:
     driver: git
-    initial_version: {{initial_version}}
-    uri: {{source-code-url}}
-    private_key: {{source-code-private-key}}
-    branch: {{source-code-branch}}
+    initial_version: (( grab app.initial_version ))
+    uri: (( grab app.source.uri ))
+    private_key: (( grab app.source.private_key ))
+    branch: (( grab app.source.branch ))
     file: version
 
 - name: artifact-repo
   type: maven-resource
   source:
-    url: {{artifact-repo-url}}
-    artifact: {{artifact}}
-    username: {{artifact-repo-username}}
-    password: {{artifact-repo-password}}
+    url: (( grab pipeline.repository.uri ))
+    artifact: (( grab app.artifact ))
+    username: (( grab pipeline.repository.username ))
+    password: (( grab pipeline.repository.password ))
 
 - name: pcf-resource
   type: cf
   source:
-    api: {{pcf-resource-api}}
-    username: {{pcf-resource-username}}
-    password: {{pcf-resource-password}}
-    organization: {{pcf-resource-organization}}
-    space: {{pcf-resource-space}}
-    skip_cert_check: {{pcf-resource-skip_cert_check}}
+    api: (( grab deployment.pcf.api ))
+    username: (( grab deployment.pcf.username ))
+    password: (( grab deployment.pcf.password ))
+    organization: (( grab deployment.pcf.organization ))
+    space: (( grab deployment.pcf.space ))
+    skip_cert_check: (( grab deployment.pcf.skip_cert_check ))
 
 jobs:
 - name: build-and-verify
@@ -78,9 +78,9 @@ jobs:
     file: pipeline/tasks/generate-manifest.yml
     input_mapping: {artifact: artifact-repo}
     params:
-      APP_NAME: {{pcf-app-name}}
-      APP_HOST: {{pcf-app-host}}
-      APP_DOMAIN: {{pcf-app-domain}}
+      APP_NAME: (( grab app.name ))
+      APP_HOST: (( grab deployment.pcf.host ))
+      APP_DOMAIN: (( grab deployment.pcf.domain ))
   - put: pcf-resource
     params:
       manifest: manifest/manifest.yml
