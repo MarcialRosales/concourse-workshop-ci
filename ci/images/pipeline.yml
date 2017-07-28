@@ -1,0 +1,38 @@
+---
+
+resources:
+
+- name: terraform-dockerfile
+  type: git
+  source:
+    uri: (( grab pipeline.source.uri ))
+    branch: (( grab pipeline.source.branch ))
+    private_key: (( grab pipeline.source.private_key ))
+    paths: [ docker/terraform/*]
+
+- name: terraform-image
+  type: docker-image
+  source:
+    username: (( grab pipeline.registry.username ))
+    password: (( grab pipeline.registry.password ))
+    repository: (( concat pipeline.registry.root "/terraform"))
+
+- name: pipeline
+  type: git
+  source:
+    uri: (( grab pipeline.source.uri ))
+    branch: (( grab pipeline.source.branch ))
+    private_key: (( grab pipeline.source.private_key ))
+
+jobs:
+
+- name: terraform
+  public: true
+  plan:
+  - aggregate:
+    - get: terraform-dockerfile
+      trigger: true
+    - get: pipeline
+  - put: terraform-image
+    params:
+      build: terraform-dockerfile/docker/terraform
