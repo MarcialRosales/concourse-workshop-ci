@@ -17,13 +17,6 @@ resources:
     password: (( grab pipeline.registry.password ))
     repository: (( concat pipeline.registry.root "/terraform"))
 
-- name: pipeline
-  type: git
-  source:
-    uri: (( grab pipeline.source.uri ))
-    branch: (( grab pipeline.source.branch ))
-    private_key: (( grab pipeline.source.private_key ))
-
 jobs:
 
 - name: terraform
