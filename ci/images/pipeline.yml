@@ -8,14 +8,14 @@ resources:
     uri: (( grab pipeline.source.uri ))
     branch: (( grab pipeline.source.branch ))
     private_key: (( grab pipeline.source.private_key ))
-    paths: [ docker/terraform/*]
+    paths: [ docker/terraform/* ]
 
 - name: terraform-image
   type: docker-image
   source:
     username: (( grab pipeline.registry.username ))
     password: (( grab pipeline.registry.password ))
-    repository: (( concat pipeline.registry.root "/terraform"))
+    repository: (( concat pipeline.registry.root "/terraform" ))
 
 jobs:
 
