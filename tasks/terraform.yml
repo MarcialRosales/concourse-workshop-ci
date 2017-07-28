@@ -6,6 +6,8 @@ image_resource:
     # TODO PUT A TAG
 inputs:
   - name: pipeline
-  - name: source-code
+  - name: artifact
+params:
+  ARTIFACT_TYPE: "tar"
 run:
   path: pipeline/tasks/terraform.sh

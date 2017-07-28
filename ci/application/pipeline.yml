@@ -79,24 +79,25 @@ jobs:
 
 - name: provision
   plan:
-  - get: source-code
-#    trigger:true
-#    passed: [build-and-verify]
+  - get: artifact-repo
+    trigger: true
+    passed: [build-and-verify]
   - get: pipeline
   - task: apply
     file: pipeline/tasks/terraform.yml
+    input_mapping: {artifact: artifact-repo}
     params:
-      TF_VAR_API_URL: (( grab deployment.dev.pcf.api ))
-      TF_VAR_USER: (( grab deployment.dev.pcf.username ))
-      TF_VAR_PASSWORD: (( grab deployment.dev.pcf.password ))
-      TF_VAR_ORG: (( grab deployment.dev.pcf.organization ))
-      TF_VAR_SPACE: (( grab deployment.dev.pcf.space ))
+      TF_VAR_api_url: (( grab deployment.dev.pcf.api ))
+      TF_VAR_user: (( grab deployment.dev.pcf.username ))
+      TF_VAR_password: (( grab deployment.dev.pcf.password ))
+      TF_VAR_org: (( grab deployment.dev.pcf.organization ))
+      TF_VAR_space: (( grab deployment.dev.pcf.space ))
           
 - name: deploy
   plan:
   - get: artifact-repo
     trigger: true
-    passed: [build-and-verify]
+    passed: [provision]
   - get: pipeline
   - get: source-code
   - task: generate-manifest
