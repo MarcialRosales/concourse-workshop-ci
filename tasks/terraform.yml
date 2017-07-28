@@ -1,0 +1,10 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: marcialfrg/terraform
+    # TODO PUT A TAG
+inputs:
+  - name: pipeline
+run:
+  path: pipeline/tasks/terraform.sh

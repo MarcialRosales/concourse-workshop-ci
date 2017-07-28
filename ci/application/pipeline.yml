@@ -4,6 +4,7 @@ groups:
   jobs:
   - build-and-verify
   - deploy
+  - provision
 - name: versioning
   jobs:
   - increase-minor
@@ -76,6 +77,20 @@ jobs:
       file: build-artifact/*.jar
       pom_file: source-code/pom.xml
 
+- name: provision
+  plan:
+  - get: source-code
+#    trigger:true
+#    passed: [build-and-verify]
+  - task: apply
+    file: pipeline/tasks/terraform.yml
+    params:
+      TF_VAR_API_URL: (( grab deployment.dev.pcf.api ))
+      TF_VAR_USER: (( grab deployment.dev.pcf.username ))
+      TF_VAR_PASSWORD: (( grab deployment.dev.pcf.password ))
+      TF_VAR_ORG: (( grab deployment.dev.pcf.organization ))
+      TF_VAR_SPACE: (( grab deployment.dev.pcf.space ))
+          
 - name: deploy
   plan:
   - get: artifact-repo
