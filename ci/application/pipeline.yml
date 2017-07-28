@@ -53,15 +53,15 @@ resources:
     username: (( grab pipeline.repository.username ))
     password: (( grab pipeline.repository.password ))
 
-- name: pcf-resource
+- name: pcf-dev
   type: cf
   source:
-    api: (( grab deployment.pcf.api ))
-    username: (( grab deployment.pcf.username ))
-    password: (( grab deployment.pcf.password ))
-    organization: (( grab deployment.pcf.organization ))
-    space: (( grab deployment.pcf.space ))
-    skip_cert_check: (( grab deployment.pcf.skip_cert_check ))
+    api: (( grab deployment.dev.pcf.api ))
+    username: (( grab deployment.dev.pcf.username ))
+    password: (( grab deployment.dev.pcf.password ))
+    organization: (( grab deployment.dev.pcf.organization ))
+    space: (( grab deployment.dev.pcf.space ))
+    skip_cert_check: (( grab deployment.dev.pcf.skip_cert_check ))
 
 jobs:
 - name: build-and-verify
@@ -82,6 +82,7 @@ jobs:
   - get: source-code
 #    trigger:true
 #    passed: [build-and-verify]
+  - get: pipeline
   - task: apply
     file: pipeline/tasks/terraform.yml
     params:
@@ -103,9 +104,9 @@ jobs:
     input_mapping: {artifact: artifact-repo}
     params:
       APP_NAME: (( grab app.name ))
-      APP_HOST: (( grab deployment.pcf.host ))
-      APP_DOMAIN: (( grab deployment.pcf.domain ))
-  - put: pcf-resource
+      APP_HOST: (( grab deployment.dev.pcf.host ))
+      APP_DOMAIN: (( grab deployment.dev.pcf.domain ))
+  - put: pcf-dev
     params:
       manifest: manifest/manifest.yml
 
