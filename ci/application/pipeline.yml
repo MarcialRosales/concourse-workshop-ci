@@ -17,7 +17,12 @@ resource_types:
     repository: pivotalpa/maven-resource
     tag: 1.3.2
 
-resources:
+#- name: email
+#  type: docker-image
+#  source:
+#    repository: mdomke/concourse-email-resource
+  
+resources:   
 
 - name: pipeline
   type: git
@@ -63,6 +68,11 @@ resources:
     space: (( grab deployment.dev.pcf.space ))
     skip_cert_check: (( grab deployment.dev.pcf.skip_cert_check ))
 
+#- name: release-announcement
+#  type: email
+#  source:
+#    from: (( grab pipeline.emailAddress ))
+
 jobs:
 - name: build-and-verify
   plan:
@@ -78,9 +88,9 @@ jobs:
       pom_file: source-code/pom.xml
 
 - name: provision
+  disable_manual_trigger: true
   plan:
   - get: artifact-repo
-    trigger: true
     passed: [build-and-verify]
   - get: pipeline
   - task: apply
@@ -94,6 +104,7 @@ jobs:
       TF_VAR_space: (( grab deployment.dev.pcf.space ))
           
 - name: deploy
+  disable_manual_trigger: true
   plan:
   - get: artifact-repo
     trigger: true
