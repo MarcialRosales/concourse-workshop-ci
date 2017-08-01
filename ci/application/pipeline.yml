@@ -95,14 +95,14 @@ jobs:
     params:
       file: build-artifact/*.jar
       pom_file: source-code/pom.xml
-  - get: deployments    
+  - get: deployment-manifest
   - task: promote-release
     file: pipeline/tasks/promote-release.yml
     params:
       MANIFEST_FILE: development/manifest.yml
-  - put: deployments
+  - put: deployment-manifest
     params:
-      repository: deployments-updated
+      repository: deployment-manifest-updated
       rebase: true
 
 - name: provision

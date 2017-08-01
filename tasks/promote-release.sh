@@ -2,11 +2,11 @@
 
 set -eu
 
-cp -R deployment/. deployment-updated  # duplicate git repo files for update
+cp -R deployment-manifest/. deployment-manifest-updated  # duplicate git repo files for update
 
 VERSION=`cat version/number`
 
-cd deployment-updated
+cd deployment-manifest-updated
 
 git checkout build    # make changes to a branch other than master
 

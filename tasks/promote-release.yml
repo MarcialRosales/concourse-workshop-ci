@@ -7,9 +7,9 @@ image_resource:
 inputs:
   - name: pipeline
   - name: version
-  - name: deployment
+  - name: deployment-manifest
 outputs:
-  - name: deployment-updated
+  - name: deployment-manifest-updated
 params: 
   MANIFEST_FILE: 
 
