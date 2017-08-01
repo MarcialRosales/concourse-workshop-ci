@@ -73,6 +73,15 @@ resources:
 #  source:
 #    from: (( grab pipeline.emailAddress ))
 
+- name: deployment-manifest
+  type: git
+  source:
+    uri: (( grab app.source.uri ))
+    branch: deployments
+    private_key: (( grab app.source.private_key ))
+    paths:
+      - development/manifest.yml
+
 jobs:
 - name: build-and-verify
   plan:
@@ -86,6 +95,15 @@ jobs:
     params:
       file: build-artifact/*.jar
       pom_file: source-code/pom.xml
+  - get: deployments    
+  - task: promote-release
+    file: pipeline/tasks/promote-release.yml
+    params:
+      MANIFEST_FILE: development/manifest.yml
+  - put: deployments
+    params:
+      repository: deployments-updated
+      rebase: true
 
 - name: provision
   disable_manual_trigger: true
