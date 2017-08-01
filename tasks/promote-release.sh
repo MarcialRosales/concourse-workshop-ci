@@ -8,7 +8,7 @@ VERSION=`cat version/number`
 
 cd deployment-manifest-updated
 
-git checkout build    # make changes to a branch other than master
+git checkout promote-deployments    # make changes to a branch other than master
 
 set +x
 cat > manifest.yml <<EOF
