@@ -17,6 +17,10 @@ PIPELINE=$2
 CREDENTIALS=credentials.yml
 SECRETS=secrets.yml
 
+if ! [ -d "$SECRETS" -a  -d "$SECRETS.gpg" ]; then
+  echo "Decrypting $SECRETS.gpg ..."
+  p=`lpass show --password localhost/$PIPELINE`; gpg  --batch --passphrase="$p" -d $SECRETS.gpg > $SECRETS; unset p
+fi
 
 tmp=$(mktemp $TMPDIR/pipeline.XXXXXX.yml)
 trap 'rm $tmp' EXIT
